@@ -7,14 +7,15 @@
     <title>YICLIC</title>
 </head>
 <body>
-    <h1>Location Test</h1>
-    <button onclick="GeolocationCoordinates()">Get my Location</button>
+    <h1>Test</h1>
+    <input type="text" id="food_input" placeholder="What food do you want?">
 
     <div id="map"></div>
 
-    <script src="js/map.js"></script>
+    <script src="js/location.js"></script>
 
     <!-- google map API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXqa5rapB99QikbAyLycbf9gVPOcAJa1w"></script>
+    <!-- &libraries=places 加了才能用 place api -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXqa5rapB99QikbAyLycbf9gVPOcAJa1w&libraries=places"></script>
 </body>
 </html>
