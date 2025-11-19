@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            GeolocationCoordinates();
+            GeolocationCoordinates(keyword);
         }
     })
 })
