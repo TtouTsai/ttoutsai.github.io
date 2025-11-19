@@ -1,24 +1,45 @@
 let map;
 let markers = [];
+const PRESET_KEYWORDS = ["咖啡", "早午餐", "日式", "韓食", "中式", "甜點", "牛排", "火鍋", "義大利麵", "素食"];
 
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("food_input");
+    const select = document.getElementById("food_select");
     if (!input) return;
+
+    if (select) {
+        PRESET_KEYWORDS.forEach((keyword) => {
+            const option = document.createElement("option");
+            option.value = keyword;
+            option.textContent = keyword;
+            select.appendChild(option);
+        });
+
+        select.addEventListener("change", () => {
+            const selected = select.value;
+            if (!selected) return;
+            input.value = selected;
+            handleKeywordSearch(selected);
+        });
+    }
 
     input.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
             event.preventDefault();  // prevent form submission
-
-            const keyword = input.value.trim();
-            if (!keyword) {
-                alert("Please enter a food type.");
-                return;
-            }
-
-            GeolocationCoordinates(keyword);
+            handleKeywordSearch(input.value);
         }
-    })
-})
+    });
+});
+
+function handleKeywordSearch(rawKeyword) {
+    const keyword = rawKeyword.trim();
+    if (!keyword) {
+        alert("Please enter a food type.");
+        return;
+    }
+
+    GeolocationCoordinates(keyword);
+}
 
 function GeolocationCoordinates(keyword) {
     if (navigator.geolocation) {
