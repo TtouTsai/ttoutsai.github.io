@@ -7,14 +7,21 @@
     <title>YICLIC</title>
 </head>
 <body>
-    <h1>Test</h1>
+    <div class="container">
+        <h1>YICLIC FOOD FINDER</h1>
 
-    <label for="food_select">快速選擇：</label>
-    <select id="food_select">
-        <option value="">請選擇預設關鍵字</option>
-    </select>
+        <div class="search-controls">
+            <div class="input-group">
+                <input type="text" id="food_input" placeholder="">
+                <label for="food_input">Food Type</label>
+            </div>
 
-    <input type="text" id="food_input" placeholder="What food do you want?">
+            <select id="food_select">
+                <option value="" hidden>Recommand Types</option>
+            </select>
+        </div>
+
+    </div>
 
     <div id="map"></div>
 

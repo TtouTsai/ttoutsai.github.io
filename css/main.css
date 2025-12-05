@@ -1,6 +1,95 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+    color: #333;
+    display: flex;
+    flex-direction: column;  /* 垂直排列內容 */
+    align-items: center;     /* 水平置中 */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    width: 100%;
+    max-width: 800px;
+}
+
+h1 {
+    font-size: 3em;
+    font-weight: 300;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.search-controls {
+    display: flex;
+    gap: 5px;
+    /* align-items: center; */
+    align-items: flex-end;
+    margin-bottom: 15px;
+}
+
+.input-group {
+    position: relative;
+}
+
+#food_input {
+    width: 100%;
+    border-color: transparent;
+    z-index: 2;
+}
+#food_input,
+#food_select {
+    height: 36px;
+    box-sizing: border-box;
+    margin-top: 0;
+    margin-bottom: 0;
+
+    padding: 5px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: .7em;
+}
+
+.input-group label {
+    position: absolute;
+    top: 9px;
+    left: 19px;
+    color: #999;
+    pointer-events: none;
+    z-index: 1;
+    font-size: .8em;
+}
+
+#food_input:focus + label,
+#food_input:not(:placeholder-shown) + label {
+    /* label 變成一條橫線然後再消失 */
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+}
+
+
 #map {
-    height: 400px;
-    width: 600px;
+    height: 350px;
+    width: 90%;
+    max-width: 700px;
     margin-top: 10px;
-    border: 1px solid #000;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    /* 先隱藏地圖 */
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+#map.map-visible {
+    display: block;
+    visibility: visible;
+    opacity: 1;
 }
