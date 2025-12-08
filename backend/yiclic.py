@@ -295,6 +295,7 @@ def run_pipeline(
 
     for attempt in range(5):
         try:
+            print(">> call gpt, reviews:", len(all_reviews_list))
             conversation = client.chat.completions.create(
                 # model="gpt-5-mini",
                 model="gpt-5-nano",
@@ -304,7 +305,7 @@ def run_pipeline(
                     {"role": "user", "content": train_prompt}
                 ]
             )
-
+            print("<< gpt ok")
             reply = conversation.choices[0].message.content.strip()
 
             # 一行一個分數
@@ -376,37 +377,67 @@ def run_pipeline(
     MANUAL_COL = "manual"   # 我們只用 manual 作為星級
 
     print("✅ 已讀入 CSV，前 5 筆：")
-    #display(df.head())
 
+    # =========================
+    # Step 1. 日期轉天數
+    # =========================
     def parse_relative_date(s: str):
         if pd.isna(s):
             return np.nan
         s = str(s).strip()
-        if "今天" in s: return 0
-        if "昨天" in s: return 1
+
+        if "：" in s:
+            s = s.split("：", 1)[-1].strip()
+
+        for fmt in ("%Y/%m/%d", "%Y-%m-%d", "%Y.%m.%d"):
+            try:
+                dt = datetime.strptime(s.split()[0], fmt)
+                return (datetime.now() - dt).days
+            except Exception:
+                pass
+
+        if "今天" in s:
+            return 0
+        if "昨天" in s:
+            return 1
+
         m = re.search(r"(\\d+)\\s*年", s)
-        if m: return int(m.group(1)) * 365
+        if m:
+            return int(m.group(1)) * 365
         m = re.search(r"(\\d+)\\s*個?月", s)
-        if m: return int(m.group(1)) * 30
+        if m:
+            return int(m.group(1)) * 30
         m = re.search(r"(\\d+)\\s*(週|周|星期)", s)
-        if m: return int(m.group(1)) * 7
+        if m:
+            return int(m.group(1)) * 7
         m = re.search(r"(\\d+)\\s*天", s)
-        if m: return int(m.group(1))
+        if m:
+            return int(m.group(1))
         return np.nan
 
     df["age_days"] = df[DATE_COL].apply(parse_relative_date)
     median_age = df["age_days"].median()
+    if pd.isna(median_age):
+        median_age = 0
     df["age_days"] = df["age_days"].fillna(median_age)
 
+    # =========================
+    # Step 2. 計算時間權重
+    # =========================
     half_life_days = 180.0
     lam = math.log(2) / half_life_days
     df["time_weight"] = np.exp(-lam * df["age_days"])
+    df["time_weight"] = df["time_weight"].fillna(1.0)
 
+    # =========================
+    # Step 3. 對每間店做 Dir(T) 分數（跳過 manual=-1）
+    # =========================
     MAX_STAR = 5
     PRIOR_ALPHA = 1.0
 
     def dirT_score_for_shop_manual(group: pd.DataFrame):
         group_valid = group[(group[MANUAL_COL] != -1) & (pd.notna(group[MANUAL_COL]))]
+
         if group_valid.empty:
             return pd.Series({f"p_{j}": np.nan for j in range(1, MAX_STAR+1)} | {"dirT_score": np.nan})
 
@@ -435,10 +466,13 @@ def run_pipeline(
     shop_scores_sorted.to_csv(output_scores_file, index=False)
     print("✅ 已輸出 CSV：", output_scores_file)
 
+    shop_scores_sorted_records = shop_scores_sorted.to_dict(orient="records")
+
     return {
         "all_reviews": collected_data,
         "gpt_scores": all_scores,
         "shop_scores_sorted": shop_scores_sorted,
+        "shop_scores_sorted_records": shop_scores_sorted_records,
     }
 
 

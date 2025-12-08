@@ -60,5 +60,16 @@ def process_places(data: PlaceRequest):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"處理失敗: {exc}")
 
-    top5 = result["top_sorted"][:5]
-    return {"top5": top5, "reviews": result["all_reviews"]}
+    top_sorted = result.get("top_sorted") or []
+    # 只回前端需要的欄位
+    top5 = [
+        {
+            "name": item.get("name"),
+            "place_id": item.get("place_id"),
+            # dirT_score 為主要排序分數，若沒有則退回 score 欄位
+            "score": item.get("dirT_score", item.get("score")),
+        }
+        for item in top_sorted[:5]
+    ]
+
+    return {"top5": top5, "reviews": result.get("all_reviews")}
