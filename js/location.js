@@ -37,6 +37,7 @@ function handleKeywordSearch(rawKeyword) {
     const keyword = rawKeyword.trim();
     if (!keyword) {
         alert("Please enter a food type.");
+        MapVisible(false);
         return;
     }
 
@@ -50,6 +51,7 @@ function GeolocationCoordinates(keyword) {
     }
     else {
         alert("Geolocation is not supported by this browser.");
+        MapVisible(false);
     }
 }
 
@@ -75,6 +77,8 @@ function showError(error) {
             alert("An unknown error occurred.");
             break;
     }
+
+    MapVisible(false);
 }
 
 function clearMarker() {
@@ -97,6 +101,9 @@ function showPosOnMap(pos, keyword) {
         alert("Map not found.");
         return;
     }
+
+    // show the map
+    MapVisible(true);
 
     map = new google.maps.Map(mapElement, {
         center: { lat: latitude, lng: longitude },
@@ -126,6 +133,7 @@ function showPosOnMap(pos, keyword) {
     service.nearbySearch(request, (results, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
             alert("Place search failed, try other keyword.");
+            MapVisible(false);
             return;
         }
 
